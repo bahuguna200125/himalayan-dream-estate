@@ -27,24 +27,25 @@ interface Property {
   }>
 }
 
+
 export default function AdminDashboard() {
-  const session = useSession();
-  const data = session && session.data;
-  const router = useRouter()
-  const { toast } = useToast()
-  const [properties, setProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
+  const session = typeof useSession === 'function' ? useSession() : undefined;
+  const status = session?.status;
+  const data = session?.data;
+  const router = useRouter();
+  const { toast } = useToast();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
-    if (session.status === 'loading') return
-    
+    if (status === 'loading') return;
     if (!data) {
-      router.push('/admin/login')
-      return
+      router.push('/admin/login');
+      return;
     }
-
-    fetchProperties()
-  }, [data, session.status, router])
+    fetchProperties();
+  }, [data, status, router]);
 
   const fetchProperties = async () => {
     try {
@@ -101,7 +102,8 @@ export default function AdminDashboard() {
     }
   }
 
-  if (session.status === 'loading' || loading) {
+
+  if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -109,11 +111,11 @@ export default function AdminDashboard() {
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data) {
-    return null
+    return null;
   }
 
   const stats = {
