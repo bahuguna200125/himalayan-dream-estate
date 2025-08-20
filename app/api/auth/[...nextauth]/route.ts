@@ -50,14 +50,17 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role
+      if (user && 'role' in user) {
+        // Persist the user's role onto the JWT token
+        token.role = (user as { role?: string }).role;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.role = token.role
+      if (session?.user && token && 'role' in token) {
+        // Expose role on the session object for the client
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(session.user as any).role = (token as any).role
       }
       return session
     }
