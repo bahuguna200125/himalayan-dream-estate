@@ -28,22 +28,23 @@ interface Property {
 }
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession()
+  const session = useSession();
+  const data = session && session.data;
   const router = useRouter()
   const { toast } = useToast()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (session.status === 'loading') return
     
-    if (!session) {
+    if (!data) {
       router.push('/admin/login')
       return
     }
 
     fetchProperties()
-  }, [session, status, router])
+  }, [data, session.status, router])
 
   const fetchProperties = async () => {
     try {
@@ -100,7 +101,7 @@ export default function AdminDashboard() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  if (session.status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -111,7 +112,7 @@ export default function AdminDashboard() {
     )
   }
 
-  if (!session) {
+  if (!data) {
     return null
   }
 
@@ -133,7 +134,7 @@ export default function AdminDashboard() {
               <span className="text-xl font-bold text-gray-900">Admin Dashboard</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {session.user?.name}</span>
+              <span className="text-sm text-gray-600">Welcome, {data.user?.name}</span>
               <Button variant="outline" size="sm" onClick={() => signOut()}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
